@@ -6,9 +6,6 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -28,38 +25,26 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Unzip mobile build
-        run: |
-          if [ -f AIMIM_Workers_Mobile_Cloud_Build.zip ]; then
-            unzip -o AIMIM_Workers_Mobile_Cloud_Build.zip -d build_source
-          else
-            mkdir -p build_source/aimim_android_cloudbuild
-            cp -r . build_source/aimim_android_cloudbuild || true
-          fi
-
       - name: Install dependencies and build web app
         run: |
-          cd build_source/aimim_android_cloudbuild
-          if [ -f package.json ]; then
-            npm install --legacy-peer-deps || npm install
-            npm run build || true
-          fi
+          npm install --legacy-peer-deps || npm install
+          npm run build || npx vite build
 
-      - name: Prepare Android project
+      - name: Initialize Capacitor and Android platform
         run: |
-          cd build_source/aimim_android_cloudbuild
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist || true
           npx cap add android || true
-          npx cap sync android || true
+          npx cap sync android
 
       - name: Build debug APK
         run: |
-          cd build_source/aimim_android_cloudbuild/android
+          cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: AIMIM-Workers-APK
-          path: build_source/aimim_android_cloudbuild/android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: warn
+          path: android/app/build/outputs/apk/debug/app-debug.apk
