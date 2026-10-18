@@ -19,9 +19,8 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps || npm install
 
-      - name: Build Web Assets (Skip Typecheck Errors)
-        run: |
-          npx vite build || npm run build || true
+      - name: Build Web Assets
+        run: npx vite build || npm run build || true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -29,10 +28,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Capacitor & Build APK
+      - name: Build APK with Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
           mkdir -p dist
