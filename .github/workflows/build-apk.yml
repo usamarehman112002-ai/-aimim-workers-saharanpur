@@ -30,23 +30,18 @@ jobs:
           npm install --legacy-peer-deps --force
           npm run build || npx vite build || true
 
-      - name: Initialize Capacitor and Sync Android
+      - name: Add Capacitor and Create Android Folder
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps --force
           npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist || true
-          npx cap add android || true
-          npx cap sync android || true
+          npx cap add android
+          npx cap copy android
 
       - name: Build debug APK
         run: |
-          if [ -d "android" ]; then
-            cd android
-            chmod +x gradlew
-            ./gradlew assembleDebug --no-daemon
-          else
-            echo "Android directory missing"
-            exit 1
-          fi
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
