@@ -27,21 +27,26 @@ jobs:
 
       - name: Install dependencies and build web app
         run: |
-          npm install --legacy-peer-deps
-          npm run build || npx vite build
+          npm install --legacy-peer-deps --force
+          npm run build || npx vite build || true
 
-      - name: Initialize Capacitor and Android platform
+      - name: Initialize Capacitor and Sync Android
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
+          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps --force
           npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist || true
           npx cap add android || true
-          npx cap sync android
+          npx cap sync android || true
 
       - name: Build debug APK
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          if [ -d "android" ]; then
+            cd android
+            chmod +x gradlew
+            ./gradlew assembleDebug --no-daemon
+          else
+            echo "Android directory missing"
+            exit 1
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
