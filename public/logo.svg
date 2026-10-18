@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="40%" stop-color="#022c22" />
+      <stop offset="100%" stop-color="#011612" />
+    </linearGradient>
+
+    <!-- Gold Metallic Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="25%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="75%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#92400e" />
+    </linearGradient>
+
+    <!-- Kite Emerald Gradient -->
+    <linearGradient id="kiteGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <!-- Kite Saffron/Gold Accent -->
+    <linearGradient id="kiteGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Circular Outer Shield / Border -->
+  <circle cx="256" cy="256" r="248" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="8" filter="url(#dropShadow)" />
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#10b981" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="6,4" />
+
+  <!-- Inner Decorative Ring -->
+  <circle cx="256" cy="256" r="228" fill="#042f2e" fill-opacity="0.6" stroke="url(#goldGrad)" stroke-width="1.5" />
+
+  <!-- UP Badge at Top Left / Right -->
+  <g transform="translate(256, 42)">
+    <rect x="-35" y="-14" width="70" height="24" rx="12" fill="url(#goldGrad)" filter="url(#dropShadow)" />
+    <text x="0" y="3" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="13" fill="#022c22" text-anchor="middle" letter-spacing="1">U.P.</text>
+  </g>
+
+  <!-- ==================== KITE (पतंग) GRAPHIC ==================== -->
+  <g transform="translate(256, 175) scale(0.92)" filter="url(#dropShadow)">
+    
+    <!-- Kite Main Diamond Body -->
+    <!-- Left Top Half (Green Gradient) -->
+    <polygon points="0,-120 -110,0 0,25" fill="url(#kiteGreenGrad)" stroke="url(#goldGrad)" stroke-width="2.5" />
+    <!-- Right Top Half (Gold Accent) -->
+    <polygon points="0,-120 110,0 0,25" fill="url(#kiteGoldGrad)" stroke="url(#goldGrad)" stroke-width="2.5" />
+    
+    <!-- Left Bottom Half (Emerald) -->
+    <polygon points="-110,0 0,110 0,25" fill="#047857" stroke="url(#goldGrad)" stroke-width="2.5" />
+    <!-- Right Bottom Half (Deep Green) -->
+    <polygon points="110,0 0,110 0,25" fill="#065f46" stroke="url(#goldGrad)" stroke-width="2.5" />
+
+    <!-- Center Spine (Vertical Stick) -->
+    <line x1="0" y1="-128" x2="0" y2="120" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Curved Bow (Horizontal Bow / कांप) -->
+    <path d="M -110,0 Q 0,-60 110,0" fill="none" stroke="url(#goldGrad)" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Center Star Emblem inside Kite -->
+    <circle cx="0" cy="0" r="22" fill="#022c22" stroke="url(#goldGrad)" stroke-width="3" />
+    <polygon points="0,-14 4,-4 14,-4 6,3 9,13 0,7 -9,13 -6,3 -14,-4 -4,-4" fill="url(#goldGrad)" />
+
+    <!-- Kite Tail (Triangle at bottom) -->
+    <polygon points="-26,115 26,115 0,155" fill="url(#goldGrad)" stroke="#b45309" stroke-width="2" />
+    <polygon points="-14,120 14,120 0,146" fill="#064e3b" />
+
+    <!-- Flying Strings (Dor / मांझा) -->
+    <path d="M 0,25 Q -30,60 -65,100 Q -100,140 -120,200" fill="none" stroke="#fef08a" stroke-width="1.8" stroke-dasharray="4,2" opacity="0.8" />
+    <path d="M 0,25 Q 30,60 65,100 Q 100,140 120,200" fill="none" stroke="#fef08a" stroke-width="1.8" stroke-dasharray="4,2" opacity="0.8" />
+  </g>
+
+  <!-- ==================== BRANDING TEXT ==================== -->
+  
+  <!-- "AIMIM Workers" Ribbon / Banner -->
+  <g transform="translate(256, 375)">
+    <!-- Decorative Banner Plate -->
+    <rect x="-170" y="-24" width="340" height="46" rx="23" fill="url(#goldGrad)" filter="url(#dropShadow)" stroke="#fef08a" stroke-width="2" />
+    <rect x="-162" y="-18" width="324" height="34" rx="17" fill="#022c22" />
+    
+    <!-- Text: AIMIM Workers -->
+    <text x="0" y="7" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="900" font-size="27" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="2" filter="url(#softGlow)">
+      AIMIM WORKERS
+    </text>
+  </g>
+
+  <!-- "जिला सहारनपुर" Subtitle in Hindi Devanagari -->
+  <g transform="translate(256, 442)">
+    <!-- Gold Underline / Ornament -->
+    <path d="M -110,-18 L -40,-18 M 40,-18 L 110,-18" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" />
+    <circle cx="0" cy="-18" r="3.5" fill="#f59e0b" />
+    <circle cx="-15" cy="-18" r="2" fill="#fbbf24" />
+    <circle cx="15" cy="-18" r="2" fill="#fbbf24" />
+
+    <!-- Text: जिला सहारनपुर -->
+    <text x="0" y="8" font-family="'Tiro Devanagari Hindi', 'Rozha One', 'Noto Sans Devanagari', 'Mangal', sans-serif" font-weight="700" font-size="28" fill="#ffffff" text-anchor="middle" letter-spacing="1">
+      जिला सहारनपुर
+    </text>
+    <text x="0" y="27" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="11" fill="#6ee7b7" text-anchor="middle" letter-spacing="3">
+      SAHARANPUR (U.P.)
+    </text>
+  </g>
+
+</svg>

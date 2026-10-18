@@ -1,0 +1,38 @@
+{
+  "id": "/",
+  "name": "AIMIM Workers — जिला सहारनपुर",
+  "short_name": "AIMIM सहारनपुर",
+  "description": "एआईएमआईएम जिला सहारनपुर के सभी 7 विधानसभा क्षेत्रों के कार्यकर्ताओं एवं कमेटियों का प्रबंधन प्रणाली।",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#022c22",
+  "theme_color": "#064e3b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ]
+}

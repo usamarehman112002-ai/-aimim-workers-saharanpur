@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidWorker(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 120 &&
+             data.mobile is string && data.mobile.size() >= 10 && data.mobile.size() <= 15 &&
+             data.assembly is string && data.assembly.size() <= 100 &&
+             data.block is string && data.block.size() <= 100 &&
+             data.villageOrWard is string && data.villageOrWard.size() <= 150 &&
+             data.role is string && data.role.size() <= 100 &&
+             data.section is string;
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // AIMIM Saharanpur Workers Collection: /workers/{workerId}
+    match /workers/{workerId} {
+      // Allow reading worker directory
+      allow get, list: if true;
+
+      // Allow creating a new worker with validation and authentication
+      allow create: if isSignedIn() && isValidId(workerId) && isValidWorker(incoming());
+
+      // Allow updating existing worker records with validation and authentication
+      allow update: if isSignedIn() && isValidId(workerId) && isValidWorker(incoming());
+
+      // Allow deleting worker records if authenticated
+      allow delete: if isSignedIn();
+    }
+  }
+}

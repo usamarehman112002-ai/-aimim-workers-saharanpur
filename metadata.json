@@ -1,0 +1,6 @@
+{
+  "name": "AIMIM Workers — जिला सहारनपुर",
+  "description": "एआईएमआईएम जिला सहारनपुर के सभी 7 विधानसभा क्षेत्रों के कार्यकर्ताओं एवं कमेटियों का प्रबंधन प्रणाली।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

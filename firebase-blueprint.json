@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Worker": {
+      "title": "Worker",
+      "description": "Party worker and committee member for AIMIM Saharanpur district",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the worker record"
+        },
+        "name": {
+          "type": "string",
+          "description": "Worker full name",
+          "maxLength": 100
+        },
+        "fatherName": {
+          "type": "string",
+          "description": "Father or guardian name",
+          "maxLength": 100
+        },
+        "mobile": {
+          "type": "string",
+          "description": "Primary 10-digit mobile number",
+          "pattern": "^[0-9]{10,12}$"
+        },
+        "altMobile": {
+          "type": "string",
+          "description": "Alternative mobile or WhatsApp number"
+        },
+        "assembly": {
+          "type": "string",
+          "description": "Assembly constituency in Saharanpur (e.g. 01 - बेहट, 02 - नकुड़, etc.)"
+        },
+        "block": {
+          "type": "string",
+          "description": "Development block or municipal zone"
+        },
+        "villageOrWard": {
+          "type": "string",
+          "description": "Village panchayat or urban ward"
+        },
+        "section": {
+          "type": "string",
+          "description": "Committee section (district_core, district_committee, assembly_core, assembly_committee, block_committee, village_committee, all_workers)"
+        },
+        "role": {
+          "type": "string",
+          "description": "Designation or title in party committee"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Responsibilities, notes or booth details"
+        },
+        "joiningYear": {
+          "type": "string",
+          "description": "Year of joining party"
+        },
+        "bloodGroup": {
+          "type": "string",
+          "description": "Blood group"
+        },
+        "address": {
+          "type": "string",
+          "description": "Full postal address"
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Whether worker is currently active"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last updated timestamp in milliseconds"
+        }
+      },
+      "required": ["name", "mobile", "assembly", "block", "villageOrWard", "section", "role"]
+    }
+  },
+  "firestore": {
+    "/workers/{workerId}": {
+      "schema": {
+        "$ref": "#/entities/Worker"
+      },
+      "description": "Collection of AIMIM Saharanpur party worker records"
+    }
+  }
+}
