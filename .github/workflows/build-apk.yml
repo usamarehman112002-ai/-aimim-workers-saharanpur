@@ -19,8 +19,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build Web App
-        run: npm run build
+      - name: Add Capacitor & Android Platform
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist
+          npm run build
+          npx cap add android
+          npx cap copy android
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -31,11 +36,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Build APK with Capacitor
+      - name: Build APK with Gradle
         run: |
-          npx cap add android || true
-          npx cap copy android
-          cd android && ./gradlew assembleDebug
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v3
