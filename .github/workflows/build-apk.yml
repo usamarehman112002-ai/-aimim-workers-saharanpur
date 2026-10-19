@@ -26,25 +26,31 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Install dependencies and build web app
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --force
+
+      - name: Build web app with larger Workbox cache limit
         run: |
-          npm install --legacy-peer-deps --force
+          if [ -f vite.config.ts ]; then
+            sed -i '/maximumFileSizeToCacheInBytes/d' vite.config.ts
+          fi
+          if [ -f vite.config.js ]; then
+            sed -i '/maximumFileSizeToCacheInBytes/d' vite.config.js
+          fi
           npm run build || npx vite build
 
-      - name: Add Capacitor and create Android project
+      - name: Install Capacitor and create Android project
         run: |
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest --legacy-peer-deps --force
+          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest sharp --legacy-peer-deps --force
           npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist
           npx cap add android
 
-      - name: Set Android app icon from logo
+      - name: Generate Android launcher icons
         run: |
           if [ ! -f public/logo.png ]; then
             echo "ERROR: public/logo.png not found"
             exit 1
           fi
-
-          npm install sharp --no-save --legacy-peer-deps --force
 
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-hdpi
@@ -82,13 +88,13 @@ jobs:
 
           npx cap sync android
 
-      - name: Build debug APK
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AIMIM-Workers-APK
