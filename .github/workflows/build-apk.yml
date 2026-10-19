@@ -29,17 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps --force
 
-      - name: Build web app with larger Workbox cache limit
-        run: |
-          if [ -f vite.config.ts ]; then
-            sed -i '/maximumFileSizeToCacheInBytes/d' vite.config.ts
-          fi
-          if [ -f vite.config.js ]; then
-            sed -i '/maximumFileSizeToCacheInBytes/d' vite.config.js
-          fi
-          npm run build || npx vite build
+      - name: Build web app
+        run: npm run build
 
-      - name: Install Capacitor and create Android project
+      - name: Install Capacitor and Sharp
         run: |
           npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest sharp --legacy-peer-deps --force
           npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist
@@ -74,15 +67,12 @@ jobs:
             const dir = `android/app/src/main/res/${folder}`;
             mkdirSync(dir, { recursive: true });
 
-            await sharp('public/logo.png')
-              .resize(size, size, { fit: 'contain', background: '#ffffff' })
-              .png()
-              .toFile(`${dir}/ic_launcher.png`);
-
-            await sharp('public/logo.png')
-              .resize(size, size, { fit: 'contain', background: '#ffffff' })
-              .png()
-              .toFile(`${dir}/ic_launcher_round.png`);
+            for (const name of ['ic_launcher.png', 'ic_launcher_round.png']) {
+              await sharp('public/logo.png')
+                .resize(size, size, { fit: 'contain', background: '#064e3b' })
+                .png()
+                .toFile(`${dir}/${name}`);
+            }
           }
           NODE
 
