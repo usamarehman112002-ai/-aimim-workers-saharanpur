@@ -1,3 +1,4 @@
+
 name: Build AIMIM Workers APK
 
 on:
@@ -30,26 +31,54 @@ jobs:
           npm install --legacy-peer-deps --force
           npm run build || npx vite build
 
-      - name: Add Capacitor, Custom Icon and Create Android Folder
+      - name: Add Capacitor and create Android project
         run: |
           npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest --legacy-peer-deps --force
           npx cap init "AIMIM Workers" "com.aimim.workers.saharanpur" --web-dir dist
           npx cap add android
 
-          # यहाँ आपके लोगो को एंड्रॉइड के आइकॉन फोल्डर में सेट किया जा रहा है
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-          if [ -f public/logo.png ]; then
-            cp public/logo.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-            cp public/logo.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-            cp public/logo.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-            cp public/logo.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-            cp public/logo.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-            cp public/logo.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-            cp public/logo.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-            cp public/logo.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-            cp public/logo.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-            cp public/logo.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+      - name: Set Android app icon from logo
+        run: |
+          if [ ! -f public/logo.png ]; then
+            echo "ERROR: public/logo.png not found"
+            exit 1
           fi
+
+          npm install sharp --no-save --legacy-peer-deps --force
+
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+          node --input-type=module <<'NODE'
+          import sharp from 'sharp';
+          import { mkdirSync } from 'node:fs';
+
+          const sizes = {
+            'mipmap-mdpi': 48,
+            'mipmap-hdpi': 72,
+            'mipmap-xhdpi': 96,
+            'mipmap-xxhdpi': 144,
+            'mipmap-xxxhdpi': 192
+          };
+
+          for (const [folder, size] of Object.entries(sizes)) {
+            const dir = `android/app/src/main/res/${folder}`;
+            mkdirSync(dir, { recursive: true });
+
+            await sharp('public/logo.png')
+              .resize(size, size, { fit: 'contain', background: '#ffffff' })
+              .png()
+              .toFile(`${dir}/ic_launcher.png`);
+
+            await sharp('public/logo.png')
+              .resize(size, size, { fit: 'contain', background: '#ffffff' })
+              .png()
+              .toFile(`${dir}/ic_launcher_round.png`);
+          }
+          NODE
 
           npx cap sync android
 
