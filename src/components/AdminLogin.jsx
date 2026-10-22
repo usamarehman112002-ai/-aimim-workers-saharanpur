@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  signInWithRedirect, 
+  signOut,
+  User 
+} from 'firebase/auth';
 
-export function AdminLogin({ user, onClose }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+interface AdminLoginProps {
+  user: User | null;
+  onClose?: () => void;
+}
 
-  const handleLogin = async (e) => {
-    if (e) e.preventDefault();
-    
+export function AdminLogin({ user, onClose }: AdminLoginProps) {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // 1. ईमेल और पासवर्ड से लॉगिन
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!email || !password) {
-      setError('कृपया ईमेल और पासवर्ड दोनों दर्ज करें।');
+      setError('कृपया ईमेल और पासवर्ड दर्ज करें।');
       return;
     }
 
@@ -23,7 +36,7 @@ export function AdminLogin({ user, onClose }) {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       alert('सफलतापूर्वक एडमिन लॉगिन हो गया!');
       if (onClose) onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setError('गलत ईमेल या पासवर्ड! कृपया दोबारा जांचें।');
     } finally {
@@ -31,11 +44,37 @@ export function AdminLogin({ user, onClose }) {
     }
   };
 
+  // 2. गूगल से लॉगिन (मोबाइल फ्रेंडली)
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    try {
+      // पहले पॉप-अप से प्रयास करें
+      await signInWithPopup(auth, provider);
+      alert('गूगल से सफलतापूर्वक लॉगिन हो गया!');
+      if (onClose) onClose();
+    } catch (popupErr: any) {
+      console.warn('Popup blocked, falling back to redirect...', popupErr);
+      try {
+        // अगर पॉप-अप ब्लॉक हो जाए तो रिडायरेक्ट का इस्तेमाल करें
+        await signInWithRedirect(auth, provider);
+      } catch (redirectErr: any) {
+        console.error(redirectErr);
+        setError('गूगल लॉगिन में समस्या आई। कृपया ईमेल-पासवर्ड से प्रयास करें।');
+        setLoading(false);
+      }
+    }
+  };
+
+  // 3. लॉगआउट
   const handleLogout = async () => {
     try {
       const auth = getAuth();
       await signOut(auth);
-      alert('आप सफलतापूर्वक लॉगआउट हो चुके हैं।');
+      alert('आप लॉगआउट हो चुके हैं।');
       if (onClose) onClose();
     } catch (err) {
       console.error(err);
@@ -46,7 +85,7 @@ export function AdminLogin({ user, onClose }) {
     <div style={styles.overlay}>
       <div style={styles.card}>
         <div style={styles.header}>
-          <h2 style={{ fontSize: '18px', margin: 0 }}>🔐 एडमिन लॉगिन</h2>
+          <h2 style={{ fontSize: '18px', margin: 0, color: '#fbbf24' }}>🔐 एडमिन लॉगिन</h2>
           {onClose && (
             <button style={styles.closeBtn} onClick={onClose} type="button">
               ✕
@@ -57,9 +96,9 @@ export function AdminLogin({ user, onClose }) {
         {user ? (
           <div style={styles.loggedInBox}>
             <p style={{ color: '#4ade80', fontWeight: 'bold', margin: 0 }}>
-              ✓ आप वर्तमान में लॉग इन हैं
+              ✓ आप एडमिन के रूप में लॉग इन हैं
             </p>
-            <p style={{ fontSize: '14px', color: '#cbd5e1', wordBreak: 'break-all' }}>
+            <p style={{ fontSize: '13px', color: '#cbd5e1', wordBreak: 'break-all' }}>
               {user.email}
             </p>
             <button onClick={handleLogout} style={styles.logoutBtn} type="button">
@@ -67,83 +106,51 @@ export function AdminLogin({ user, onClose }) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleLogin} style={styles.form}>
+          <div style={styles.container}>
             {error && <p style={styles.error}>{error}</p>}
 
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>एडमिन ईमेल ID</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="usamarehman112002@gmail.com"
-                style={styles.input}
-              />
-            </div>
-
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>पासवर्ड</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                style={styles.input}
-              />
-            </div>
-
+            {/* Google Login बटन */}
             <button
-              type="submit"
-              onClick={handleLogin}
+              type="button"
+              onClick={handleGoogleLogin}
               disabled={loading}
               style={{
-                ...styles.submitBtn,
+                ...styles.googleBtn,
                 opacity: loading ? 0.7 : 1,
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'सत्यापित हो रहा है...' : 'लॉग इन करें'}
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              Google खाते से लॉगिन करें
             </button>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
 
-const styles = {
-  overlay: {
-    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 9999, padding: '16px'
-  },
-  card: {
-    backgroundColor: '#022c22',
-    border: '1px solid #16a34a',
-    borderRadius: '12px',
-    padding: '20px',
-    width: '100%',
-    maxWidth: '360px',
-    color: '#ffffff',
-    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
-  },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' },
-  closeBtn: { background: 'none', border: 'none', color: '#fff', fontSize: '20px', padding: '4px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '14px' },
-  inputGroup: { display: 'flex', flexDirection: 'column', gap: '4px' },
-  label: { fontSize: '12px', color: '#6ee7b7' },
-  input: {
-    padding: '10px 12px', borderRadius: '6px', border: '1px solid #15803d',
-    backgroundColor: '#052e16', color: '#fff', fontSize: '14px', outline: 'none'
-  },
-  submitBtn: {
-    padding: '12px', backgroundColor: '#eab308', color: '#000', border: 'none',
-    borderRadius: '6px', fontWeight: 'bold', fontSize: '14px', marginTop: '6px'
-  },
-  loggedInBox: { textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' },
-  logoutBtn: { padding: '10px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold' },
-  error: { color: '#fca5a5', fontSize: '12px', backgroundColor: 'rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', margin: 0 }
-};
+            <div style={styles.divider}>
+              <span style={styles.dividerText}>अथवा ईमेल से लॉग इन करें</span>
+            </div>
+
+            {/* ईमेल पासवर्ड फॉर्म */}
+            <form onSubmit={handleEmailLogin} style={styles.form}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>एडमिन ईमेल ID</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="usamarehman112002@gmail.com"
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>पासवर्ड</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e
