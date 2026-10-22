@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { 
   getAuth, 
@@ -5,23 +6,17 @@ import {
   GoogleAuthProvider, 
   signInWithPopup,
   signInWithRedirect, 
-  signOut,
-  User 
+  signOut 
 } from 'firebase/auth';
 
-interface AdminLoginProps {
-  user: User | null;
-  onClose?: () => void;
-}
-
-export function AdminLogin({ user, onClose }: AdminLoginProps) {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+export function AdminLogin({ user, onClose }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // 1. ईमेल और पासवर्ड से लॉगिन
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setError('कृपया ईमेल और पासवर्ड दर्ज करें।');
@@ -36,7 +31,7 @@ export function AdminLogin({ user, onClose }: AdminLoginProps) {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       alert('सफलतापूर्वक एडमिन लॉगिन हो गया!');
       if (onClose) onClose();
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError('गलत ईमेल या पासवर्ड! कृपया दोबारा जांचें।');
     } finally {
@@ -44,7 +39,7 @@ export function AdminLogin({ user, onClose }: AdminLoginProps) {
     }
   };
 
-  // 2. गूगल से लॉगिन (मोबाइल फ्रेंडली)
+  // 2. गूगल से लॉगिन
   const handleGoogleLogin = async () => {
     setError('');
     setLoading(true);
@@ -52,16 +47,14 @@ export function AdminLogin({ user, onClose }: AdminLoginProps) {
     const provider = new GoogleAuthProvider();
 
     try {
-      // पहले पॉप-अप से प्रयास करें
       await signInWithPopup(auth, provider);
       alert('गूगल से सफलतापूर्वक लॉगिन हो गया!');
       if (onClose) onClose();
-    } catch (popupErr: any) {
-      console.warn('Popup blocked, falling back to redirect...', popupErr);
+    } catch (popupErr) {
+      console.warn('Popup blocked, using redirect...', popupErr);
       try {
-        // अगर पॉप-अप ब्लॉक हो जाए तो रिडायरेक्ट का इस्तेमाल करें
         await signInWithRedirect(auth, provider);
-      } catch (redirectErr: any) {
+      } catch (redirectErr) {
         console.error(redirectErr);
         setError('गूगल लॉगिन में समस्या आई। कृपया ईमेल-पासवर्ड से प्रयास करें।');
         setLoading(false);
@@ -153,4 +146,71 @@ export function AdminLogin({ user, onClose }: AdminLoginProps) {
                   type="password"
                   required
                   value={password}
-                  onChange={(e
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={styles.input}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  ...styles.submitBtn,
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {loading ? 'सत्यापित हो रहा है...' : 'लॉग इन करें'}
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const styles = {
+  overlay: {
+    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    zIndex: 99999, padding: '16px'
+  },
+  card: {
+    backgroundColor: '#022c22',
+    border: '1px solid #15803d',
+    borderRadius: '16px',
+    padding: '20px',
+    width: '100%',
+    maxWidth: '360px',
+    color: '#ffffff',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
+  },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' },
+  closeBtn: { background: 'none', border: 'none', color: '#9ca3af', fontSize: '20px', padding: '4px', cursor: 'pointer' },
+  container: { display: 'flex', flexDirection: 'column', gap: '14px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  inputGroup: { display: 'flex', flexDirection: 'column', gap: '4px' },
+  label: { fontSize: '12px', color: '#6ee7b7' },
+  input: {
+    padding: '10px 12px', borderRadius: '8px', border: '1px solid #16a34a',
+    backgroundColor: '#052e16', color: '#fff', fontSize: '14px', outline: 'none'
+  },
+  submitBtn: {
+    padding: '12px', backgroundColor: '#eab308', color: '#000', border: 'none',
+    borderRadius: '8px', fontWeight: 'bold', fontSize: '14px', marginTop: '4px'
+  },
+  googleBtn: {
+    width: '100%', padding: '10px', backgroundColor: '#ffffff', color: '#1f2937',
+    border: '1px solid #d1d5db', borderRadius: '8px', fontWeight: '600',
+    fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    gap: '8px', cursor: 'pointer'
+  },
+  divider: { display: 'flex', alignItems: 'center', textAlign: 'center', margin: '4px 0' },
+  dividerText: { width: '100%', fontSize: '11px', color: '#9ca3af' },
+  loggedInBox: { textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' },
+  logoutBtn: { padding: '10px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' },
+  error: { color: '#fca5a5', fontSize: '12px', backgroundColor: 'rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '6px', margin: 0 }
+};
